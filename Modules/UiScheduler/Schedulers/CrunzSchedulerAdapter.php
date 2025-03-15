@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Modules\UiScheduler\Schedulers;
 
 use Crunz\Schedule;
+use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Support\Facades\Log;
 use Modules\UiScheduler\App\Jobs\ProcessJob;
 
@@ -65,12 +66,9 @@ class CrunzSchedulerAdapter implements SchedulerAdapterInterface
 
     }
 
-    // todo probrat na meetu
-    public static function initializationLaravel()
+    public static function initializationLaravel(): void
     {
-        // Initialization of Laravel
-        $app = require '/var/www/html/uischeduler/bootstrap/app.php';
-        $app->make(\Illuminate\Contracts\Console\Kernel::class)->bootstrap();
-
+        $app = require __DIR__.'/../../../bootstrap/app.php';
+        $app->make(Kernel::class)->bootstrap();
     }
 }
