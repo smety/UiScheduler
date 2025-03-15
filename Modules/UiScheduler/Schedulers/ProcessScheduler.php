@@ -1,35 +1,34 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\UiScheduler\Schedulers;
 
-use Modules\UiScheduler\Mutexes\MutexFactory;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Log;
+use Modules\UiScheduler\Mutexes\MutexAdapterInterface;
+use Modules\UiScheduler\Mutexes\MutexFactory;
 
 class ProcessScheduler
 {
-    protected $mutexFactory;
+    protected MutexFactory $mutexFactory;
 
     public function __construct()
     {
-        $this->mutexFactory =  new MutexFactory();
+        $this->mutexFactory = new MutexFactory();
     }
 
-    public function loadJobs()
+    public function loadJobs(): array
     {
-        //Load crons/jobs
-        $jobs = config('uischeduler_jobs');
-        return $jobs;
+        return config('uischeduler_jobs');
     }
 
     public function generateMutexKey(array $job): string
     {
-        $key ='mutex_' . md5($job['command'] . $job['frequency']);
-        //Generate Mutex key for locking
-        return $key;
+        return sprintf('mutex_%s_%s', $job['command'], $job['frequency']);
     }
 
-    public function prepareMutex(array $job)
+    public function prepareMutex(array $job): MutexAdapterInterface
     {
         $key = $this->generateMutexKey($job);
         $mutex = $this->mutexFactory->createMutex($key);
@@ -39,25 +38,24 @@ class ProcessScheduler
         return $mutex;
     }
 
-    public static function processJobs($mutex, $job)
+    public static function processJobs($mutex, $job): void
     {
-        //Check if is possible generate Mutex 
+        // Check if is possible generate Mutex
         if ($mutex->acquire($mutex->key, $mutex->ttl)) {
-            Log::info("-- Mutex Acquired: " . $job['command']);
+            Log::info('-- Mutex Acquired: '.$job['command']);
             try {
 
                 if ($job['type'] === 'command') {
-                    Log::info("[QUEUE JOB RUN]");
+                    Log::info('[QUEUE JOB RUN]');
                     Artisan::call($job['command']);
 
                 }
             } finally {
                 $mutex->release($mutex->key);
-                Log::info("-- Mutex Released: " . $job['command']);
+                Log::info('-- Mutex Released: '.$job['command']);
             }
         } else {
-            Log::info("-- Mutex Locked - SKIP: " . $job['command']);
+            Log::info('-- Mutex Locked - SKIP: '.$job['command']);
         }
     }
-
 }

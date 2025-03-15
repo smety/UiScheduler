@@ -1,17 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\UiScheduler\Schedulers;
 
 use Crunz\Schedule;
-use Illuminate\Support\Facades\Config;
-use Modules\UiScheduler\Schedulers\ProcessScheduler;
-use Modules\UiScheduler\App\Jobs\ProcessJob;
 use Illuminate\Support\Facades\Log;
-
+use Modules\UiScheduler\App\Jobs\ProcessJob;
 
 class CrunzSchedulerAdapter implements SchedulerAdapterInterface
 {
-    protected $processScheduler;
+    protected ProcessScheduler $processScheduler;
 
     /**
      * Constructor to initialize ProcessScheduler.
@@ -33,6 +32,7 @@ class CrunzSchedulerAdapter implements SchedulerAdapterInterface
         foreach ($this->processScheduler->loadJobs() as $job) {
             $this->scheduleJob($schedule, $job);
         }
+
         return $schedule;
     }
 
@@ -41,18 +41,18 @@ class CrunzSchedulerAdapter implements SchedulerAdapterInterface
      */
     public function scheduleJob($schedule, array $job): void
     {
-         // Prepare Mutex with key
+        // Prepare Mutex with key
         $mutex = $this->processScheduler->prepareMutex($job); // Prepare Mutex with key
-        
-        // Schedule the job with the defined frequency and description        
+
+        // Schedule the job with the defined frequency and description
         $schedule->run(function () use ($mutex, $job) {
-            Self::initializationLaravel(); // Laravel Initialization - Facades, Artisan, Config, etc.
+            self::initializationLaravel(); // Laravel Initialization - Facades, Artisan, Config, etc.
             // Dispatch the job to the queue
             ProcessJob::dispatch($mutex, $job);
-            //ProcessScheduler::processJobs($mutex, $job);
-            Log::info($job['command'] . " job processed to queue.");
+            // ProcessScheduler::processJobs($mutex, $job);
+            Log::info($job['command'].' job processed to queue.');
         })->cron($job['frequency'])
-          ->description($job['description']);
+            ->description($job['description']);
     }
 
     /**
@@ -62,14 +62,15 @@ class CrunzSchedulerAdapter implements SchedulerAdapterInterface
     {
         // Run Crunz Scheduler
         shell_exec('vendor/bin/crunz schedule:run');
-        return;
+
     }
 
+    // todo probrat na meetu
     public static function initializationLaravel()
     {
         // Initialization of Laravel
         $app = require '/var/www/html/uischeduler/bootstrap/app.php';
         $app->make(\Illuminate\Contracts\Console\Kernel::class)->bootstrap();
-        return;
+
     }
 }

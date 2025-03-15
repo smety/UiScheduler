@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\UiScheduler\Console;
 
 use Illuminate\Console\Command;
@@ -10,21 +12,14 @@ class UiSchedulerRun extends Command
 {
     protected $signature = 'uischeduler:run';
 
-    protected $schedulerFactory;
-
-    public function __construct(SchedulerFactory $schedulerFactory)
+    public function __construct(
+        private SchedulerFactory $schedulerFactory)
     {
         parent::__construct();
-        $this->schedulerFactory = $schedulerFactory;
     }
 
-    public function handle()
+    public function handle(): void
     {
-        try {
-            // Run SchedulerFactory
-            $this->schedulerFactory->run($this->getLaravel());
-        } catch (\Exception $e) {
-            Log::error('SchedulerFactory failed to run. Error: ' . $e->getMessage());
-        }
+        $this->schedulerFactory->run($this->getLaravel());
     }
 }

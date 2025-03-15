@@ -9,7 +9,7 @@ services:
     restart: unless-stopped
     working_dir: /var/www/html
     volumes:
-      - ./laravel:/var/www/html
+      - ./:/var/www/html
     depends_on:
       - mysql
       - redis
@@ -23,7 +23,7 @@ services:
     ports:
       - "8080:80"
     volumes:
-      - ./laravel:/var/www/html
+      - ./:/var/www/html
       - ./docker/nginx/conf.d:/etc/nginx/conf.d
     depends_on:
       - app
@@ -65,7 +65,7 @@ services:
     working_dir: /var/www/html
     command: ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
     volumes:
-      - ./laravel:/var/www/html
+      - ./:/var/www/html
       - ./docker/supervisor/conf.d:/etc/supervisor/conf.d
     depends_on:
       - app
