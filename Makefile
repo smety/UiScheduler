@@ -115,6 +115,12 @@ init-composer:
 	$(DOCKER_COMPOSE) run --rm $(APP_CONTAINER) composer require crunzphp/crunz && \
 	$(DOCKER_COMPOSE) run --rm $(APP_CONTAINER) composer require predis/predis
 
+phpstan:
+	$(DOCKER_COMPOSE) run --rm $(APP_CONTAINER) vendor/bin/phpstan analyse --memory-limit=2G
+
+pint:
+	$(DOCKER_COMPOSE) run --rm $(APP_CONTAINER) php vendor/bin/pint
+
 init-npm:
 	$(DOCKER_COMPOSE) run --rm $(APP_CONTAINER) npm install
 
@@ -158,6 +164,8 @@ help:
 	@echo "  make supervisor-status  - Zkontrolovat stav Supervisor procesů"
 	@echo "  make fix-permissions    - Opravit oprávnění souborů"
 	@echo "  make clear-cache        - Vyčistit cache"
+	@echo "  make phpstan            - Spustit PHPStan"
+	@echo "  make pint               - Spustit Pint"
 	@echo ""
 	@echo "Sestavení a inicializace:"
 	@echo "  make build              - Sestavit Docker image"

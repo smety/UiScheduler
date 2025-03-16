@@ -13,7 +13,7 @@ class UiSchedulerController extends Controller
      *
      * @return Renderable
      */
-    public function index()
+    public function index(): Renderable
     {
         return view('uischeduler::index');
     }
@@ -23,20 +23,12 @@ class UiSchedulerController extends Controller
      *
      * @return Renderable
      */
-    public function create()
+    public function create(): Renderable
     {
         return view('uischeduler::create');
+
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @return Renderable
-     */
-    public function store(Request $request)
-    {
-        //
-    }
 
     /**
      * Show the specified resource.
@@ -44,7 +36,7 @@ class UiSchedulerController extends Controller
      * @param  int  $id
      * @return Renderable
      */
-    public function show($id)
+    public function show(int $id): Renderable
     {
         return view('uischeduler::show');
     }
@@ -55,30 +47,8 @@ class UiSchedulerController extends Controller
      * @param  int  $id
      * @return Renderable
      */
-    public function edit($id)
+    public function edit(int $id): Renderable
     {
         return view('uischeduler::edit');
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  int  $id
-     * @return Renderable
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return Renderable
-     */
-    public function destroy($id)
-    {
-        //
     }
 }

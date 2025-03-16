@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Modules\UiScheduler\Console;
 
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Log;
 use Modules\UiScheduler\Schedulers\SchedulerFactory;
 
 class UiSchedulerRun extends Command
@@ -13,8 +12,8 @@ class UiSchedulerRun extends Command
     protected $signature = 'uischeduler:run';
 
     public function __construct(
-        private SchedulerFactory $schedulerFactory)
-    {
+        private SchedulerFactory $schedulerFactory
+    ) {
         parent::__construct();
     }
 
