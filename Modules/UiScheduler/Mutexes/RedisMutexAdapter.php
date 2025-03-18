@@ -3,7 +3,6 @@
 namespace Modules\UiScheduler\Mutexes;
 
 use Predis\Client;
-use Illuminate\Support\Facades\Config;
 
 /**
  * RedisMutexAdapter is responsible for handling Redis-based locks.
@@ -11,6 +10,7 @@ use Illuminate\Support\Facades\Config;
 class RedisMutexAdapter implements MutexAdapterInterface
 {
     private $client;
+
     private $lock;
 
     /**
@@ -20,17 +20,16 @@ class RedisMutexAdapter implements MutexAdapterInterface
     {
         $this->client = new Client([
             'scheme' => config('uischeduler_config.redis.scheme'),
-            'host'   => config('uischeduler_config.redis.host'),
-            'port'   => config('uischeduler_config.redis.port'),
+            'host' => config('uischeduler_config.redis.host'),
+            'port' => config('uischeduler_config.redis.port'),
         ]);
     }
 
     /**
      * Acquire a Redis lock.
      *
-     * @param string $key Lock key
-     * @param int $ttl Time-to-live in seconds
-     * @return bool
+     * @param  string  $key  Lock key
+     * @param  int  $ttl  Time-to-live in seconds
      */
     public function acquire($key, $ttl): bool
     {
@@ -38,14 +37,13 @@ class RedisMutexAdapter implements MutexAdapterInterface
         $lock = $this->client->set($key, 'locked', 'EX', $ttl, 'NX');
         $this->lock = $lock ? $key : null;
 
-        return (bool)$lock;
+        return (bool) $lock;
     }
 
     /**
      * Release the Redis lock.
      *
-     * @param string $key Lock key
-     * @return bool
+     * @param  string  $key  Lock key
      */
     public function release($key): bool
     {
@@ -55,7 +53,7 @@ class RedisMutexAdapter implements MutexAdapterInterface
             $result = $this->client->del([$lock]);
             $this->lock = null;
 
-            return (bool)$result;
+            return (bool) $result;
         }
 
         return false;
@@ -64,14 +62,13 @@ class RedisMutexAdapter implements MutexAdapterInterface
     /**
      * Check if the Redis lock exists.
      *
-     * @param string $key Lock key
-     * @return bool
+     * @param  string  $key  Lock key
      */
     public function exists($key): bool
     {
         // Check if the lock key exists in Redis
         $exists = $this->client->exists($key);
 
-        return (bool)$exists;
+        return (bool) $exists;
     }
 }

@@ -2,9 +2,8 @@
 
 namespace Modules\UiScheduler\Tasks;
 
-use Modules\UiScheduler\Schedulers\CrunzSchedulerAdapter;
 use Crunz\Schedule;
-use Illuminate\Container\Container;
+use Modules\UiScheduler\Schedulers\CrunzSchedulerAdapter;
 
 // Initialize Laravel components for Crunz
 CrunzSchedulerAdapter::initializationLaravel(); // Laravel Initialization - Facades, Artisan, Config, etc.
@@ -17,7 +16,3 @@ $schedule = $adapter->schedule();
 
 // Return the configured schedule
 return $schedule;
-
-
-
-

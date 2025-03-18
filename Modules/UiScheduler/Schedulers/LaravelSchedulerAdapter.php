@@ -1,18 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\UiScheduler\Schedulers;
 
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Config;
-use Modules\UiScheduler\Schedulers\ProcessScheduler;
 use Modules\UiScheduler\App\Jobs\ProcessJob;
-
 
 class LaravelSchedulerAdapter implements SchedulerAdapterInterface
 {
-    protected $processScheduler;
+    protected ProcessScheduler $processScheduler;
 
     /**
      * Constructor to initialize ProcessScheduler.
@@ -31,6 +30,7 @@ class LaravelSchedulerAdapter implements SchedulerAdapterInterface
         foreach ($this->processScheduler->loadJobs() as $job) {
             $this->scheduleJob($schedule, $job);
         }
+
         return $schedule;
     }
 
@@ -41,15 +41,15 @@ class LaravelSchedulerAdapter implements SchedulerAdapterInterface
     {
         // Prepare Mutex with key
         $mutex = $this->processScheduler->prepareMutex($job);
-        
+
         // Schedule the job with the defined frequency and description
-        $schedule->call(function() use ($mutex, $job) {
+        $schedule->call(function () use ($mutex, $job) {
             // Dispatch the job to the queue
-            ProcessJob::dispatch($mutex, $job);           
-         //   ProcessScheduler::processJobs($mutex, $job);
-         Log::info($job['command'] . " job processed to queue.");
+            ProcessJob::dispatch($mutex, $job);
+            //   ProcessScheduler::processJobs($mutex, $job);
+            Log::info($job['command'].' job processed to queue.');
         })->cron($job['frequency'])
-          ->description($job['description']);
+            ->description($job['description']);
     }
 
     /**
@@ -59,6 +59,5 @@ class LaravelSchedulerAdapter implements SchedulerAdapterInterface
     {
         // Run Laravel Scheduler
         Artisan::call('schedule:run');
-        return;
     }
 }

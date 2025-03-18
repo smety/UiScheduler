@@ -32,7 +32,7 @@ return [
     |--------------------------------------------------------------------------
     |
     | Configure your settings for Redis, which will be used
-    | if you have selected 'redis' as your mutex type. 
+    | if you have selected 'redis' as your mutex type.
     |
     */
 

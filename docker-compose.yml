@@ -1,0 +1,83 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: uischeduler-app
+    restart: unless-stopped
+    working_dir: /var/www/html
+    volumes:
+      - ./:/var/www/html
+    depends_on:
+      - mysql
+      - redis
+    networks:
+      - uischeduler
+
+  webserver:
+    image: nginx:alpine
+    container_name: uischeduler-webserver
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    volumes:
+      - ./:/var/www/html
+      - ./docker/nginx/conf.d:/etc/nginx/conf.d
+    depends_on:
+      - app
+    networks:
+      - uischeduler
+
+  mysql:
+    image: mysql:8.0
+    container_name: uischeduler-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: uischeduler
+      MYSQL_USER: uischeduler
+      MYSQL_PASSWORD: uischeduler_password
+      MYSQL_ROOT_PASSWORD: root_password
+      SERVICE_NAME: mysql
+    ports:
+      - "3309:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - uischeduler
+
+  redis:
+    image: redis:alpine
+    container_name: uischeduler-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    networks:
+      - uischeduler
+
+  supervisor:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: uischeduler-supervisor
+    restart: unless-stopped
+    working_dir: /var/www/html
+    command: ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
+    volumes:
+      - ./:/var/www/html
+      - ./docker/supervisor/conf.d:/etc/supervisor/conf.d
+    depends_on:
+      - app
+      - mysql
+      - redis
+    networks:
+      - uischeduler
+
+networks:
+  uischeduler:
+    driver: bridge
+
+volumes:
+  mysql_data:
+    driver: local

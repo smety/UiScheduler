@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\UiScheduler\Console;
 
+use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 
@@ -9,30 +12,27 @@ class JobRun extends Command
 {
     protected $signature = 'job:run {jobName}';
 
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
-    public function handle()
+    /**
+     * @throws Exception
+     */
+    public function handle(): void
     {
         $jobName = $this->argument('jobName');
 
         // Name of Job with path
-        $jobClass = "App\\Jobs\\{$jobName}";
+        $jobClass = sprintf("App\Jobs\%s", $jobName);
 
         // Check class exists
         if (class_exists($jobClass)) {
             try {
-                // Instantiate and run the job directly
                 $jobInstance = app($jobClass);
                 $jobInstance->handle();
-                Log::info("Job {$jobName} executed successfully.");
-            } catch (\Exception $e) {
-                Log::error("Job {$jobName} failed to execute. Error: " . $e->getMessage());
+                Log::info(sprintf("Job %s executed successfully.", $jobName));
+            } catch (Exception $e) {
+                throw new Exception($e->getMessage());
             }
         } else {
-            Log::error("Job {$jobName} was not found.");
+            throw new Exception(sprintf("Job %s was not found.", $jobName));
         }
     }
 }

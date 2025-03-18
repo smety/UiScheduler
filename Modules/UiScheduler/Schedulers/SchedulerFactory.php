@@ -3,46 +3,42 @@
 namespace Modules\UiScheduler\Schedulers;
 
 use Illuminate\Support\Facades\Log;
-use Modules\UiScheduler\Schedulers\LaravelSchedulerAdapter;
-use Modules\UiScheduler\Schedulers\CrunzSchedulerAdapter;
-use Illuminate\Container\Container;
-use Illuminate\Support\Facades\Config;
 
 class SchedulerFactory
 {
     /**
      * Run the scheduler based on the configured scheduler type.
      *
-     * @param Container $container
      * @return void
      */
-    public static function run(Container $container)
-    {  
+    public static function run(): void
+    {
         // Get the scheduler type from the configuration
-        $schedulerType = Self::getSchedulerType();
-        $mutexType = Self::getMutexType();
+        $schedulerType = self::getSchedulerType();
+        $mutexType = self::getMutexType();
 
         // Log the start of the scheduler run
         Log::info('----------------------------------------------------------------------------------------------');
-        Log::info($schedulerType . ' scheduler - START.');
-        Log::info($mutexType . ' mutex.');
+        Log::info($schedulerType.' scheduler - START.');
+        Log::info($mutexType.' mutex.');
 
         // Execute the appropriate scheduler based on the type
         switch ($schedulerType) {
             case 'laravel':
-                $schedulerRun = LaravelSchedulerAdapter::run();
+                LaravelSchedulerAdapter::run();
                 break;
             case 'crunz':
-                $schedulerRun = CrunzSchedulerAdapter::run();
+                CrunzSchedulerAdapter::run();
                 break;
             default:
                 // Log an error if the scheduler type is unsupported
                 Log::error('Unsupported scheduler type.');
+
                 return;
         }
 
         // Log the completion of the scheduler run
-        Log::info($schedulerType . ' scheduler - DONE.');
+        Log::info($schedulerType.' scheduler - DONE.');
         Log::info('----------------------------------------------------------------------------------------------');
     }
 
@@ -51,16 +47,13 @@ class SchedulerFactory
      *
      * @return string
      */
-    public static function getSchedulerType()
+    public static function getSchedulerType(): string
     {
-        // Retrieve the scheduler type from the configuration file
-        $schedulerType = config('uischeduler_config.scheduler');
-        return $schedulerType;       
+        return config('uischeduler_config.scheduler');
     }
-    public static function getMutexType()
+
+    public static function getMutexType(): string
     {
-        // Retrieve the scheduler type from the configuration file
-        $mutexType = config('uischeduler_config.mutex');
-        return $mutexType;       
+        return config('uischeduler_config.mutex');
     }
 }
